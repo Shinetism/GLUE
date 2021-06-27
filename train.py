@@ -5,6 +5,7 @@ import wget, os
 from torch.utils.data import TensorDataset, random_split, DataLoader, RandomSampler, SequentialSampler
 from transformers import RobertaTokenizer
 from transformers import RobertaForSequenceClassification, AdamW, RobertaConfig
+from transformers import get_linear_schedule_with_warmup
 
 if torch.cuda.is_available():
     device = torch.device('cuda')
@@ -64,9 +65,13 @@ model = RobertaForSequenceClassification.from_pretrained(
 )
 model.to(device)
 
-## Optimizer
+## Optimizer & Scheduler
 optimizer = AdamW(model.parameters(), lr = 2e-5, eps=1e-8)
-
+epoch = 4
+total_steps = len(train_dataloader) * epoch
+scheduler = get_linear_schedule_with_warmup(optimizer,
+                                            num_warmup_steps=0,
+                                            num_training_steps=total_steps)
 
 model.train()
 
