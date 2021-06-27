@@ -1,6 +1,9 @@
 import numpy as np
 import pandas as pd
 import torch
+import random
+import time
+import datetime
 import wget, os
 from torch.utils.data import TensorDataset, random_split, DataLoader, RandomSampler, SequentialSampler
 from transformers import RobertaTokenizer
@@ -73,5 +76,53 @@ scheduler = get_linear_schedule_with_warmup(optimizer,
                                             num_warmup_steps=0,
                                             num_training_steps=total_steps)
 
-model.train()
+# Function to calculate accuracy
+def flat_accuracy(preds, labels):
+    pred_flat = np.argmax(preds, axis=1).flatten()
+    labels_flat = labels.flatten()
+    return np.sum(pred_flat == labels_flat)/len(labels_flat)
 
+# Function to format time
+def format_time(elapsed):
+    elapsed_rounded = int(round(elapsed))
+    return str(datetime.timedelta(seconds=elapsed_rounded))
+
+# Set random seeds
+seed_val = 42
+random.seed(seed_val)
+np.random.seed(seed_val)
+torch.manual_seed(seed_val)
+torch.cuda.manual_seed(seed_val)
+
+training_stats = []
+
+total_t0 = time.time()
+
+for epoch_i in range(epoch):
+    # Training the model
+    print()
+    print('========== EPOCH {:}/{:} ============'.format(epoch_i+1, epoch))
+    print('Training')
+    t0 = time.time()
+    total_train_loss = 0
+    model.train()
+    for step, batch in enumerate(train_dataloader):
+        if not step == 0:
+            elapsed = format_time(time.time()-t0)
+            print(' Batch {:>5,} of {:>5,}. Elapsed: {:}.'.format(step, len(train_dataloader), elapsed))
+        b_input_ids, b_input_mask, b_labels = batch[0].to(device), batch[1].to(device), batch[2].to(device)
+        model.zero_grad()
+        loss, logits = model(b_input_ids,
+                             token_type_ids=None,
+                             attention_mask=b_input_mask,
+                             labels=b_labels).to_tuple()
+        total_train_loss += loss.item()
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+        optimizer.step()
+        scheduler.step()
+    avg_train_loss = total_train_loss/len(train_dataloader)
+    training_time = format_time(time.time() - t0)
+    print()
+    print(' Average training loss: {0:.2f}'.format(avg_train_loss))
+    print(' Training epoch took: {:}'.format(training_time))
