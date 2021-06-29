@@ -19,7 +19,7 @@ else:
     device = torch.device('cpu')
 
 df = pd.read_csv(
-    '.\\cola_public\\raw\\in_domain_train.tsv',
+    './cola_public/raw/in_domain_train.tsv',
     delimiter='\t', header=None,
     names=['sentence_source', 'label', 'label_notes', 'sentence']
 )
