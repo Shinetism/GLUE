@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="yangguang@166.111.121.22:22 key" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
       <paths name="yangguang@166.111.121.22:22 key">
         <serverdata>
           <mappings>
-            <mapping deploy="/data/private/yangguang/GLUE" local="$PROJECT_DIR$" />
+            <mapping deploy="/data/private/yangguang/GLUE/" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>
